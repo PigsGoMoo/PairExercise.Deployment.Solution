@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { spawn } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 
 const axios = require('axios');
@@ -43,37 +43,43 @@ const getRemoteURL = (name, remotes) => {
 const getOutputFromCommand = async (command, args) => {
   const response = await new Promise((resolve, reject) => {
     console.log(`Running command: ${command}\nWith args: ${args}`);
-    const process = spawn(command, args);
-    console.log(`Command ran. ${JSON.stringify(process.stdout)}`);
+    const process = spawnSync(command, args);
+    // const process = spawn('cmd', ['echo Hello world']);
+    console.log(`Command ran.`);
     const stdout = [];
     const stderr = [];
     console.log(`stdout call`);
-    process.stdout.on('data', (data) => {
-      stdout.push(data);
-    });
-    console.log(`stdout call done. `);
-    process.stderr.on('data', (data) => {
-      stderr.push(data);
-    });
 
-    console.log(`stderr call done`);
-    console.log(`Error?`);
+    stdout.push(process.stdout);
+    // process.stdout.on('data', (data) => {
+    //   console.log(`Data coming in...`, data);
+    //   stdout.push(data);
+    // });
+    // console.log(`stdout call done. `);
+    // console.log(stdout);
+    // process.stderr.on('data', (data) => {
+    //   stderr.push(data);
+    // });
 
-    process.on('error', (err) => {
-      console.log(`error: `, err);
-      throw new Error(reject(stderr));
-    });
+    // console.log(`stderr call done`);
+    // console.log(`Error?`);
 
-    console.log(`No error...on exit...`);
-    process.on('exit', (code) => {
-      console.log(`Child exited with code: ${code}`);
-      //   if (code) throw new Error(reject(stderr));
-      //   resolve(stdout);
-    });
-    console.log(`Resolving...`);
+    // process.on('error', (err) => {
+    //   console.log(`error: `, err);
+    //   throw new Error(reject(stderr));
+    // });
+
+    // console.log(`No error...on exit...`);
+    // process.on('exit', (code) => {
+    //   console.log(`Child exited with code: ${code}`);
+    //   //   if (code) throw new Error(reject(stderr));
+    //   //   resolve(stdout);
+    // });
+    console.log(`Resolving...`, stdout);
     resolve(stdout);
   });
-  console.log(`Exiting getOutputFromCommand`);
+  console.log(`Exiting getOutputFromCommand with result: ${response}`);
+
   return response;
 };
 
@@ -91,8 +97,9 @@ const getNamesFromGit = () =>
 
 /* Use the openssl command to encrypt an authentication token. */
 const encryptHerokuToken = async () => {
-  await getOutputFromCommand('openssl', [
-    // 'openssl',
+  await getOutputFromCommand('cmd', [
+    '/c',
+    'openssl',
     'rsautl',
     '-encrypt',
     '-pubin',
@@ -142,11 +149,14 @@ const main = async () => {
   const { fullName, appName } = await getNamesFromGit();
 
   /* Get Heroku authentication token from the Heroku CLI. */
+  console.log(`Grabbing heroku token..`);
   const herokuTokenOut = await getOutputFromCommand('cmd', [
     // 'heroku',
+    '/c',
     'heroku auth:token',
   ]);
   const herokuTokenStr = herokuTokenOut.toString('utf-8');
+  console.log(`Heroku token: `, herokuTokenStr);
   const herokuToken = herokuTokenStr.slice(0, herokuTokenStr.length - 1);
   if (verbose) console.log('Received Heroku token', herokuToken.toString());
 
@@ -154,7 +164,9 @@ const main = async () => {
   const travisURL = `https://api.travis-ci.org/repos/${fullName}/key`;
   const travisResponse = await axios.get(travisURL);
   const key = travisResponse.data.key;
+  console.log(`Travis key: `, key);
   const keyBuffer = Buffer.from(key, 'utf-8');
+  console.log(`keyBuffer: `, keyBuffer);
   if (verbose) console.log('Received Travis pubkey:\n', keyBuffer.toString());
 
   /* Write files for use with openssl */
