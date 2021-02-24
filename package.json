@@ -12,7 +12,8 @@
     "start": "node server/index.js",
     "start-dev": "nodemon server/index.js --ignore public --ignore client",
     "test-windows": "set NODE_ENV=test && mocha {server,client}/**/*.test.js --require @babel/polyfill --require @babel/register",
-    "test": "NODE_ENV=test mocha {server,client}/**/*.test.js --require @babel/polyfill --require @babel/register"
+    "test": "NODE_ENV=test mocha {server,client}/**/*.test.js --require @babel/polyfill --require @babel/register",
+    "postinstall": "npm run build-client"
   },
   "keywords": [],
   "author": "",
