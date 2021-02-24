@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-client": "webpack -p",
+    "build-client": "webpack",
     "build-watch": "webpack -w",
     "deploy": "%HOMEPATH%\\Desktop\\FullStack\\PairExercise.Deployment.Solution\\script\\windows-deploy.bat",
     "heroku-token": "node ./script/encrypt-heroku-auth-token.js",
