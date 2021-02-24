@@ -42,13 +42,10 @@ const getRemoteURL = (name, remotes) => {
 /* Run a command and return its stdout. */
 const getOutputFromCommand = async (command, args) => {
   const response = await new Promise((resolve, reject) => {
-    console.log(`Running command: ${command}\nWith args: ${args}`);
     const process = spawnSync(command, args);
     // const process = spawn('cmd', ['echo Hello world']);
-    console.log(`Command ran.`);
     const stdout = [];
     const stderr = [];
-    console.log(`stdout call`);
 
     stdout.push(process.stdout);
     // process.stdout.on('data', (data) => {

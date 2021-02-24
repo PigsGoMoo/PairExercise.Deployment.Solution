@@ -4,7 +4,8 @@ import User from './User.jsx';
 export default ({ users }) => (
   <div className='user-list'>
     <p className='lead'>
-      Here's a list of {users.length} completely fictitious moo people:
+      Here's a list of {users.length} completely fictitious people: Final test
+      to see if travis works.
     </p>
 
     <table className='table'>
